@@ -3,11 +3,6 @@ Array.from||(Array.from=function(){var r=Object.prototype.toString,n=function(n)
 
 // check if has DOM
 var hasDOM = typeof document !== "undefined";
-var fs;
-
-if(!hasDOM){
-    fs = require("fs");
-}
 
 function ord(c) {
     return String.fromCharCode(c);
@@ -75,6 +70,7 @@ function Reng(code) {
         x: 1,
         y: 0
     };
+    this.delay = 0;
     this.internal = {};
     this.depth = 1;
     this.mode = 1;
@@ -767,7 +763,7 @@ Reng.prototype.step = function(callback) {
     this.advance();
     setTimeout(function() {
         callback(this);
-    }.bind(this));
+    }.bind(this), this.delay);
 }
 Reng.prototype.display = function() {
     return JSON.stringify(this.code);
@@ -836,18 +832,54 @@ if (hasDOM) {
     q.onclick = function() {
         clearInterval(intervals.pop() || -1);
     }
+    z.onclick = function(){
+        while(inst.running){
+            inst.step();
+        }
+    }
 }
 
 if (!hasDOM) {
-    var fileName = process.argv[2];
-    if (!fileName) {
-        console.error("Usage: " + process.argv[1] + " <filename>");
-        return -1;
+    var minimist, fs, fileName, contents, recur, argv, inst, path;
+    
+    fs = require("fs");
+    minimist = require("minimist");
+    path = require("path");
+    
+    argv = minimist(process.argv.slice(2), {
+        alias: { e: "encoding", d: "delay", h: "help" },
+        boolean: "help",
+        string: "encoding",
+        string: "delay",
+        default: { encoding: "latin1", delay: "none" },
+    });
+    
+    fileName = argv._[0];
+    if (!fileName || argv.help) {
+        console.error("Usage:");
+        console.error("    node " + path.basename(process.argv[1]) + " [options] filename");
+        console.error("");
+        console.error("Options:");
+        console.error("    -e, --encoding       define encoding of input file (default='latin1')");
+        console.error("    -d, --delay          delay in between steps (default='none')");
+        console.error("    -h, --help           show this help message");
+        process.exit(-1);
     }
-    var contents = readFile(process.argv[2]);
-    var k = new Reng(contents);
-    var recur = function(inst) {
-        inst.step(recur);
+    
+    contents = readFile(fileName, argv.encoding);
+    inst = new Reng(contents);
+    
+    if(inst.delay == "none"){
+        while(inst.running){
+            inst.step();
+        }
+    } else {
+        inst.delay = argv.delay;
+        
+        recur = function(inst) {
+            inst.step(recur);
+        }
+        
+        recur(inst);
     }
-    recur(k);
 }

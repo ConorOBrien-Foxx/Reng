@@ -1,0 +1,29 @@
+{
+  "name": "reng",
+  "version": "1.0.0",
+  "description": "2d language inspired by ><> and befunge",
+  "main": "reng.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ConorOBrien-Foxx/Reng.git"
+  },
+  "keywords": [
+    "reng",
+    "2d",
+    "language",
+    "esolang",
+    "esoteric"
+  ],
+  "author": "Conor O'Brien",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ConorOBrien-Foxx/Reng/issues"
+  },
+  "homepage": "https://github.com/ConorOBrien-Foxx/Reng#readme",
+  "dependencies": {
+    "minimist": "^1.2.0"
+  }
+}
